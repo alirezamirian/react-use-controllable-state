@@ -22,7 +22,8 @@
       "typings"
     ],
     "types": [
-      "jest"
+      "jest",
+      "node"
     ]
   },
   "include": ["src"],

@@ -26,6 +26,8 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } fr
  * @param valueRef
  */
 
+let warnedUserForModeRegression = false;
+
 export function useControllableState<T>(
   value: T | undefined,
   changeHandler: Dispatch<SetStateAction<T>> | undefined,
@@ -35,8 +37,13 @@ export function useControllableState<T>(
   const [stateValue, setState] = useState(initialValue);
   const wasControlled = usePrevious(value) === undefined;
   const isControlled = value !== undefined;
-  if(isControlled !== wasControlled){
-
+  if (isControlled !== wasControlled) {
+    //TODO: maybe use invariant npm package
+    if(process.env.NODE_ENV !== 'production' && !warnedUserForModeRegression){
+      warnedUserForModeRegression = true;
+      console.warn(
+        '[useControllableState] WARNING: control mode is changed from controlled to uncontrolled or vice versa.');
+    }
   }
   const effectiveValue = isControlled ? value : stateValue;
   return [effectiveValue, useCallback((update) => {

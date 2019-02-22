@@ -1,6 +1,6 @@
 {
   "name": "react-use-controllable-state",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "React hook for using controllable state",
   "main": "dist/index.js",
   "repository": "git@github.com:alirezamirian/react-use-controllable-state.git",
@@ -38,6 +38,7 @@
     "@types/enzyme": "^3.1.18",
     "@types/jest": "^24.0.6",
     "@types/mocha": "^5.2.6",
+    "@types/node": "^11.9.5",
     "@types/react": "^16.7.22",
     "@types/react-dom": "^16.8.2",
     "babel-core": "^7.0.0-bridge.0",
@@ -67,7 +68,6 @@
     "react": ">=16.7.0-alpha.1"
   },
   "husky": {
-    "hooks": {
-    }
+    "hooks": {}
   }
 }

@@ -9,6 +9,13 @@ configure({ adapter: new Adapter() });
 
 describe('useControllableState', () => {
 
+  const spyWarn = jest.spyOn( console, 'warn' );
+
+  beforeEach(() => {
+    // Resetting mock fails test. TODO: why?
+    // spyWarn.mockReset();
+  });
+
   it('should work when neither value is controlled nor change handler is passed', () => {
     const { clickHeader, isOpen } = mountUsage();
     expect(isOpen()).toBe(false);
@@ -84,6 +91,39 @@ describe('useControllableState', () => {
     const secondToggle = toggleRef.current;
     expect(firstToggle).toEqual(secondToggle);
   });
+
+
+  it('should warn user if control mode is changed', () => {
+    class ControlledUsage extends React.Component<{}, { counter: number, open: boolean }> {
+      constructor(props) {
+        super(props);
+        this.toggle = this.toggle.bind(this);
+      }
+
+      state = {
+        counter: 0,
+        open: true,
+      };
+
+      toggle(value: boolean) {
+        if (this.state.counter < 2) {
+          this.setState(state => ({
+            open: !state.open,
+            counter: state.counter + 1,
+          }));
+        }
+      }
+
+      render(): React.ReactNode {
+        return <Zippy header={'header'}
+                      open={this.state.open} onToggle={this.toggle}/>;
+      }
+    }
+    const { wrapper } = mountUsage(<ControlledUsage />);
+    wrapper.setState({ open: undefined });
+    expect(spyWarn).toBeCalled();
+  });
+
 });
 
 
