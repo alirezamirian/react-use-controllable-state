@@ -1,15 +1,29 @@
 {
   "compilerOptions": {
-    "module": "amd",
     "target": "es5",
-    "sourceMap": true,
-    "declaration": true,
-    "outDir": "dist",
-    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
     "moduleResolution": "node",
-    "sourceRoot": "src",
-    "jsx": "react"
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "typeRoots": [
+      "typings"
+    ],
+    "types": [
+      "jest"
+    ]
   },
   "include": ["src"],
   "exclude": [

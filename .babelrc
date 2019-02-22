@@ -1,7 +1,8 @@
 {
   "presets": [
     "@babel/env",
-    "@babel/typescript"
+    "@babel/typescript",
+    "react"
   ],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
