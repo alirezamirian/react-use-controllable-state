@@ -1,5 +1,5 @@
-import { useControlledState } from './useControlledState'
+import { useControllableState } from './useControllableState';
 
-export { useControlledState }
+export { useControllableState }
 
-export default useControlledState;
+export default useControllableState;

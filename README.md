@@ -1,4 +1,4 @@
-# react-use-controlled-state
+# react-use-controllable-state
 
 React hook for using controllable state.
 

@@ -2,12 +2,12 @@ import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import * as React from 'react';
 import { createRef, MutableRefObject, ReactNode } from 'react';
-import { useControlledState } from './useControlledState';
+import { useControllableState } from './useControllableState';
 
 configure({ adapter: new Adapter() });
 
 
-describe('useControlledState', () => {
+describe('useControllableState', () => {
 
   it('should work when neither value is controlled nor change handler is passed', () => {
     const { clickHeader, isOpen } = mountUsage();
@@ -105,7 +105,7 @@ interface Props {
 }
 
 function Zippy({ open, onToggle, children, header, toggleRef }: Props) {
-  const [openState, setOpen] = useControlledState(open, onToggle, false);
+  const [openState, setOpen] = useControllableState(open, onToggle, false);
   if (toggleRef) {
     toggleRef.current = setOpen;
   }

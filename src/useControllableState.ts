@@ -1,4 +1,4 @@
-import { Dispatch, MutableRefObject, SetStateAction, useCallback, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * @usage
@@ -26,25 +26,36 @@ import { Dispatch, MutableRefObject, SetStateAction, useCallback, useState } fro
  * @param valueRef
  */
 
-export function useControlledState<T>(
+export function useControllableState<T>(
   value: T | undefined,
   changeHandler: Dispatch<SetStateAction<T>> | undefined,
   initialValue: T | (() => T),
-  valueRef?: MutableRefObject<T>,
 ):
   [T, Dispatch<SetStateAction<T>>] {
   const [stateValue, setState] = useState(initialValue);
-  const effectiveValue = value !== undefined ? value : stateValue;
+  const wasControlled = usePrevious(value) === undefined;
+  const isControlled = value !== undefined;
+  if(isControlled !== wasControlled){
+
+  }
+  const effectiveValue = isControlled ? value : stateValue;
   return [effectiveValue, useCallback((update) => {
     setState(update);
     const newValue = isFunction(update) ? update(effectiveValue) : update;
-    if (valueRef) {
-      valueRef.current = newValue;
-    }
+
     if (changeHandler) {
       changeHandler(newValue);
     }
-  }, [changeHandler, valueRef])];
+  }, [changeHandler])];
+}
+
+
+function usePrevious(value) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
 }
 
 function isFunction<S>(a: SetStateAction<S>): a is ((prevState: S) => S) {

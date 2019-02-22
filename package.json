@@ -1,9 +1,9 @@
 {
-  "name": "react-use-controlled-state",
+  "name": "react-use-controllable-state",
   "version": "0.0.6",
   "description": "React hook for using controllable state",
   "main": "dist/index.js",
-  "repository": "git@github.com:alirezamirian/react-use-controlled-state.git",
+  "repository": "git@github.com:alirezamirian/react-use-controllable-state.git",
   "author": "Alireza Mirian <alireza.mirian@gmail.com>",
   "license": "MIT",
   "files": [
