@@ -1,6 +1,7 @@
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import * as React from 'react';
+import { createRef, MutableRefObject, ReactNode } from 'react';
 import { useControlledState } from './useControlledState';
 
 configure({ adapter: new Adapter() });
@@ -9,83 +10,110 @@ configure({ adapter: new Adapter() });
 describe('useControlledState', () => {
 
   it('should work when neither value is controlled nor change handler is passed', () => {
-    const { increaseBtn, valueEl } = mountUsage();
-    increaseBtn.simulate('click');
-    increaseBtn.simulate('click');
-    expect(valueEl.html()).toContain('2');
+    const { clickHeader, isOpen } = mountUsage();
+    expect(isOpen()).toBe(false);
+    clickHeader();
+    expect(isOpen()).toBe(true);
+    clickHeader();
+    expect(isOpen()).toBe(false);
   });
 
 
   it('should handle uncontrolled value and change callback', () => {
-    const changeSpy = jest.fn();
-    const { increaseBtn } = mountUsage(<Counter changeHandler={changeSpy}/>);
-    increaseBtn.simulate('click');
-    expect(changeSpy).toBeCalledWith(1);
-    increaseBtn.simulate('click');
-    expect(changeSpy).toBeCalledWith(2);
-    expect(changeSpy).toHaveBeenCalledTimes(2);
+    const onToggleSpy = jest.fn();
+    const { clickHeader } = mountUsage(<Zippy header={'header'} onToggle={onToggleSpy}/>);
+    clickHeader();
+    expect(onToggleSpy).toBeCalledWith(true);
+    clickHeader();
+    expect(onToggleSpy).toBeCalledWith(false);
+    expect(onToggleSpy).toHaveBeenCalledTimes(2);
   });
 
   it('should work in controlled mode', () => {
-    class ControlledUsage extends React.Component<{}, { value: number }> {
+    class ControlledUsage extends React.Component<{}, { counter: number, open: boolean }> {
       constructor(props) {
         super(props);
-        this.setValue = this.setValue.bind(this);
+        this.toggle = this.toggle.bind(this);
       }
 
       state = {
-        value: 2,
+        counter: 0,
+        open: true,
       };
 
-      setValue(value) {
-        if (value < 5) {
-          this.setState({ value });
+      toggle(value: boolean) {
+        if (this.state.counter < 2) {
+          this.setState(state => ({
+            open: !state.open,
+            counter: state.counter + 1,
+          }));
         }
       }
 
       render(): React.ReactNode {
-        return <Counter value={this.state.value} changeHandler={this.setValue}/>;
+        return <Zippy header={'header'}
+                      open={this.state.open} onToggle={this.toggle}/>;
       }
     }
 
-    const { increaseBtn, valueEl } = mountUsage(<ControlledUsage/>);
-    expect(valueEl.text()).toEqual('2');
-    increaseBtn.simulate('click');
-    expect(valueEl.text()).toEqual('3');
-    increaseBtn.simulate('click');
-    expect(valueEl.text()).toEqual('4');
-    increaseBtn.simulate('click');
-    expect(valueEl.text()).toEqual('4');
+    const { clickHeader, isOpen } = mountUsage(<ControlledUsage/>);
+    expect(isOpen()).toEqual(true);
+    clickHeader();
+    expect(isOpen()).toEqual(false);
+    clickHeader();
+    expect(isOpen()).toEqual(true);
+    clickHeader();
+    expect(isOpen()).toEqual(true);
   });
 
   it('should work when value is controlled but changes are ignored (readonly mode)', () => {
-    const { increaseBtn, valueEl } = mountUsage(<Counter value={3}/>);
-    increaseBtn.simulate('click');
-    increaseBtn.simulate('click');
-    expect(valueEl.text()).toEqual('3');
+    const { clickHeader, isOpen } = mountUsage(<Zippy header={'header'} open={true}/>);
+    expect(isOpen()).toEqual(true);
+    clickHeader();
+    expect(isOpen()).toEqual(true);
+    clickHeader();
+    expect(isOpen()).toEqual(true);
+  });
+
+  it('should return identical setter functions (like useState), unless onChange is changed', () => {
+    const toggleRef: Props['toggleRef'] = createRef();
+    const { clickHeader } = mountUsage(<Zippy header={'header'}
+                                              toggleRef={toggleRef} />);
+    const firstToggle = toggleRef.current;
+    clickHeader();
+    const secondToggle = toggleRef.current;
+    expect(firstToggle).toEqual(secondToggle);
   });
 });
 
 
-function mountUsage(usage = <Counter/>) {
+function mountUsage(usage = <Zippy header='header'/>) {
   const wrapper = mount(usage);
   return {
     wrapper,
-    valueEl: wrapper.find('.value'),
-    increaseBtn: wrapper.find('.btn'),
+    isOpen: () => wrapper.find('.zippy-content').length > 0,
+    clickHeader: () => wrapper.find('.zippy-header').simulate('click'),
   };
 }
 
-interface UsageProps {
-  value?: number;
-  changeHandler?: (value: number) => number | void;
+interface Props {
+  open?: boolean;
+  header: ReactNode;
+  onToggle?: (value: boolean) => boolean | void;
+  children?: ReactNode;
+  toggleRef?: MutableRefObject<this['onToggle']>;
 }
 
-function Counter({ value, changeHandler }: UsageProps) {
-  const [valueState, setValue] = useControlledState(value, changeHandler, 0);
-
-  return <div>
-    <span className="value">{valueState}</span>
-    <button className="btn" onClick={() => setValue(valueState + 1)}>Increase</button>
+function Zippy({ open, onToggle, children, header, toggleRef }: Props) {
+  const [openState, setOpen] = useControlledState(open, onToggle, false);
+  if (toggleRef) {
+    toggleRef.current = setOpen;
+  }
+  return <div className="zippy">
+    <div onClick={() => setOpen(!openState)} className="zippy-header">
+      <span>{openState ? '▼' : '▶'}</span> &nbsp;
+      {header}
+    </div>
+    {openState ? <div className="zippy-content">{children}</div> : null}
   </div>;
 }
