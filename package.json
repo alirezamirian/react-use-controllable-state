@@ -1,6 +1,6 @@
 {
   "name": "react-use-controllable-state",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "React hook for using controllable state",
   "main": "dist/index.js",
   "repository": "git@github.com:alirezamirian/react-use-controllable-state.git",
